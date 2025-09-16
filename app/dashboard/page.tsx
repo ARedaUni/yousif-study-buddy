@@ -3,35 +3,14 @@
 import { useUIStore } from '@/store/ui-store';
 import { useRevisionStore } from '@/store/revision-store';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { WeekView } from '@/components/timetable/week-view';
-import { Calendar, Clock, BarChart3, BookOpen } from 'lucide-react';
+import { Calendar, Clock } from 'lucide-react';
 
 export default function DashboardPage() {
-  const { currentView, setCurrentView, toggleSidebar, sidebarOpen } =
-    useUIStore();
-  const { sessions, topics, isGenerating, error } = useRevisionStore();
-
+  const { currentView, setCurrentView } = useUIStore();
   const handleViewChange = (view: string) => {
-    setCurrentView(view as 'week' | 'month' | 'timeline');
-  };
-
-  const handleAddTopic = () => {
-    // TODO: Open topic creation modal
-    console.log('Add topic clicked');
-  };
-
-  const handleGenerateTimetable = async () => {
-    // TODO: Add any pre-generation logic here
-    await useRevisionStore.getState().generateTimetable();
+    setCurrentView(view as 'timeline' | 'calendar' | 'chat');
   };
 
   return (

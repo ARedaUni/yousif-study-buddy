@@ -1,62 +1,79 @@
 import { create } from 'zustand';
 
-export type ViewType = 'week' | 'month' | 'timeline';
+export type ViewType = 'timeline' | 'calendar' | 'chat';
 
 interface UIState {
-  // View state
+  // Mobile-first view state
   currentView: ViewType;
   selectedSession: string | null;
-  sidebarOpen: boolean;
-  
-  // Modal states
-  sessionDialogOpen: boolean;
-  topicDialogOpen: boolean;
-  availabilityDialogOpen: boolean;
-  preferencesDialogOpen: boolean;
-  
-  // UI actions
+
+  // Mobile UI states
+  bottomSheetOpen: boolean;
+  aiChatOpen: boolean;
+  isAIGenerating: boolean;
+
+  // Modal states (now mobile-first animated modals)
+  sessionModalOpen: boolean;
+  topicModalOpen: boolean;
+  availabilityModalOpen: boolean;
+  preferencesModalOpen: boolean;
+
+  // Mobile-first actions
   setCurrentView: (view: ViewType) => void;
   setSelectedSession: (id: string | null) => void;
-  toggleSidebar: () => void;
-  setSidebarOpen: (open: boolean) => void;
-  
-  // Modal actions
-  setSessionDialogOpen: (open: boolean) => void;
-  setTopicDialogOpen: (open: boolean) => void;
-  setAvailabilityDialogOpen: (open: boolean) => void;
-  setPreferencesDialogOpen: (open: boolean) => void;
-  
+  toggleBottomSheet: () => void;
+  setBottomSheetOpen: (open: boolean) => void;
+  toggleAIChat: () => void;
+  setAIChatOpen: (open: boolean) => void;
+  setAIGenerating: (generating: boolean) => void;
+
+  // Mobile modal actions
+  setSessionModalOpen: (open: boolean) => void;
+  setTopicModalOpen: (open: boolean) => void;
+  setAvailabilityModalOpen: (open: boolean) => void;
+  setPreferencesModalOpen: (open: boolean) => void;
+
   // Utility
-  closeAllDialogs: () => void;
+  closeAllModals: () => void;
 }
 
 export const useUIStore = create<UIState>((set) => ({
-  // Initial state
-  currentView: 'week',
+  // Initial state - timeline as mobile default
+  currentView: 'timeline',
   selectedSession: null,
-  sidebarOpen: true,
-  sessionDialogOpen: false,
-  topicDialogOpen: false,
-  availabilityDialogOpen: false,
-  preferencesDialogOpen: false,
-  
-  // UI actions
+  bottomSheetOpen: false,
+  aiChatOpen: false,
+  isAIGenerating: false,
+  sessionModalOpen: false,
+  topicModalOpen: false,
+  availabilityModalOpen: false,
+  preferencesModalOpen: false,
+
+  // Mobile-first actions
   setCurrentView: (view: ViewType) => set({ currentView: view }),
   setSelectedSession: (id: string | null) => set({ selectedSession: id }),
-  toggleSidebar: () => set((state) => ({ sidebarOpen: !state.sidebarOpen })),
-  setSidebarOpen: (open: boolean) => set({ sidebarOpen: open }),
-  
-  // Modal actions
-  setSessionDialogOpen: (open: boolean) => set({ sessionDialogOpen: open }),
-  setTopicDialogOpen: (open: boolean) => set({ topicDialogOpen: open }),
-  setAvailabilityDialogOpen: (open: boolean) => set({ availabilityDialogOpen: open }),
-  setPreferencesDialogOpen: (open: boolean) => set({ preferencesDialogOpen: open }),
-  
+  toggleBottomSheet: () =>
+    set((state) => ({ bottomSheetOpen: !state.bottomSheetOpen })),
+  setBottomSheetOpen: (open: boolean) => set({ bottomSheetOpen: open }),
+  toggleAIChat: () => set((state) => ({ aiChatOpen: !state.aiChatOpen })),
+  setAIChatOpen: (open: boolean) => set({ aiChatOpen: open }),
+  setAIGenerating: (generating: boolean) => set({ isAIGenerating: generating }),
+
+  // Mobile modal actions
+  setSessionModalOpen: (open: boolean) => set({ sessionModalOpen: open }),
+  setTopicModalOpen: (open: boolean) => set({ topicModalOpen: open }),
+  setAvailabilityModalOpen: (open: boolean) =>
+    set({ availabilityModalOpen: open }),
+  setPreferencesModalOpen: (open: boolean) =>
+    set({ preferencesModalOpen: open }),
+
   // Utility
-  closeAllDialogs: () => set({
-    sessionDialogOpen: false,
-    topicDialogOpen: false,
-    availabilityDialogOpen: false,
-    preferencesDialogOpen: false,
-  }),
+  closeAllModals: () =>
+    set({
+      sessionModalOpen: false,
+      topicModalOpen: false,
+      availabilityModalOpen: false,
+      preferencesModalOpen: false,
+      bottomSheetOpen: false,
+    }),
 }));
