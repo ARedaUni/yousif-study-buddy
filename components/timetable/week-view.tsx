@@ -2,10 +2,11 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { useRevisionStore } from '@/store/revision-store';
 import { SESSION_TYPE_COLORS, DIFFICULTY_COLORS } from '@/lib/schema';
 import { format, startOfWeek, addDays, isSameDay, parseISO } from 'date-fns';
-import { Clock, BookOpen } from 'lucide-react';
+import { Clock, BookOpen, Plus, Sparkles, Calendar, ArrowRight } from 'lucide-react';
 
 const HOURS = Array.from({ length: 15 }, (_, i) => i + 7); // 7 AM to 9 PM
 const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
@@ -133,16 +134,80 @@ export function WeekView() {
       </Card>
 
       {sessions.length === 0 && (
-        <Card>
-          <CardContent className="text-center py-12">
-            <BookOpen className="h-12 w-12 mx-auto mb-4 text-gray-400" />
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">No sessions scheduled</h3>
-            <p className="text-gray-500 mb-4">
-              Add some topics and generate your timetable to get started
-            </p>
-          </CardContent>
-        </Card>
+        <EmptyWeekState />
       )}
     </div>
+  );
+}
+
+function EmptyWeekState() {
+  const { topics } = useRevisionStore();
+  
+  return (
+    <Card className="border-2 border-dashed border-gray-200 bg-gradient-to-br from-blue-50 to-indigo-50">
+      <CardContent className="text-center py-16 px-8">
+        <div className="max-w-md mx-auto space-y-6">
+          <div className="relative">
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="w-24 h-24 bg-blue-100 rounded-full opacity-20"></div>
+            </div>
+            <Calendar className="h-16 w-16 mx-auto text-blue-500 relative z-10" />
+          </div>
+          
+          <div className="space-y-3">
+            <h3 className="text-xl font-bold text-gray-900">
+              Your weekly timetable awaits
+            </h3>
+            <p className="text-gray-600 leading-relaxed">
+              {topics.length === 0 
+                ? "Start by adding your study topics, then generate an AI-powered timetable tailored to your schedule."
+                : `Great! You have ${topics.length} topic${topics.length > 1 ? 's' : ''} ready. Generate your timetable to see your weekly schedule.`
+              }
+            </p>
+          </div>
+
+          <div className="flex flex-col sm:flex-row gap-3 justify-center items-center">
+            {topics.length === 0 ? (
+              <>
+                <Button size="lg" className="bg-blue-600 hover:bg-blue-700">
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add Your First Topic
+                </Button>
+                <Button variant="outline" size="lg">
+                  <BookOpen className="h-4 w-4 mr-2" />
+                  Browse Templates
+                </Button>
+              </>
+            ) : (
+              <>
+                <Button size="lg" className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700">
+                  <Sparkles className="h-4 w-4 mr-2" />
+                  Generate Timetable
+                </Button>
+                <Button variant="outline" size="lg">
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add More Topics
+                </Button>
+              </>
+            )}
+          </div>
+
+          <div className="flex items-center justify-center space-x-6 text-sm text-gray-500 pt-4">
+            <div className="flex items-center space-x-2">
+              <div className="w-3 h-3 bg-blue-100 border border-blue-300 rounded"></div>
+              <span>New Learning</span>
+            </div>
+            <div className="flex items-center space-x-2">
+              <div className="w-3 h-3 bg-green-100 border border-green-300 rounded"></div>
+              <span>Revision</span>
+            </div>
+            <div className="flex items-center space-x-2">
+              <div className="w-3 h-3 bg-orange-100 border border-orange-300 rounded"></div>
+              <span>Practice Test</span>
+            </div>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
   );
 }
