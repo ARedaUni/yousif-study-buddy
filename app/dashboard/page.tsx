@@ -12,11 +12,7 @@ import {
 } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { TooltipProvider } from '@/components/ui/tooltip';
-import { DashboardHeader } from '@/components/layout/dashboard-header';
-import { DashboardSidebar } from '@/components/layout/dashboard-sidebar';
 import { WeekView } from '@/components/timetable/week-view';
-import { MonthView } from '@/components/timetable/month-view';
-import { TimelineView } from '@/components/timetable/timeline-view';
 import { Calendar, Clock, BarChart3, BookOpen } from 'lucide-react';
 
 export default function DashboardPage() {
@@ -41,11 +37,7 @@ export default function DashboardPage() {
   return (
     <TooltipProvider>
       <div className="min-h-screen bg-gray-50">
-        <DashboardHeader onAddTopic={handleAddTopic} />
-
         <div className="flex">
-          <DashboardSidebar onGenerateTimetable={handleGenerateTimetable} />
-
           {/* Main Content */}
           <main className="flex-1 p-6">
             <Tabs
@@ -81,13 +73,9 @@ export default function DashboardPage() {
                 <WeekView />
               </TabsContent>
 
-              <TabsContent value="month" className="space-y-4">
-                <MonthView />
-              </TabsContent>
+              <TabsContent value="month" className="space-y-4"></TabsContent>
 
-              <TabsContent value="timeline" className="space-y-4">
-                <TimelineView />
-              </TabsContent>
+              <TabsContent value="timeline" className="space-y-4"></TabsContent>
             </Tabs>
           </main>
         </div>
