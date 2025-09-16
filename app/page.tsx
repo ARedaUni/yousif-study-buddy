@@ -2,6 +2,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Calendar, Brain, Clock, BarChart3, BookOpen, Target } from "lucide-react";
+import Link from "next/link";
 
 export default function Home() {
   return (
@@ -106,10 +107,12 @@ export default function Home() {
             Join thousands of students who have improved their grades with smart, personalized revision planning.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button size="lg" className="text-lg px-8 py-3">
-              <Calendar className="w-5 h-5 mr-2" />
-              Get Started Free
-            </Button>
+            <Link href="/dashboard">
+              <Button size="lg" className="text-lg px-8 py-3">
+                <Calendar className="w-5 h-5 mr-2" />
+                Get Started Free
+              </Button>
+            </Link>
             <Button variant="outline" size="lg" className="text-lg px-8 py-3">
               <BookOpen className="w-5 h-5 mr-2" />
               Learn More

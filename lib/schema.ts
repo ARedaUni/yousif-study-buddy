@@ -74,19 +74,19 @@ export const weeklyAvailabilitySchema = z.object({
 });
 
 // Legacy availability schema for backward compatibility
-export const availabilitySchema = z.object({
-  slots: z.array(timeSlotSchema.extend({
-    day: z.enum(DAYS_OF_WEEK)
-  })),
-  schoolHours: z.object({
-    start: z.string().regex(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/),
-    end: z.string().regex(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/)
-  }).default({ start: "08:30", end: "15:30" }),
-  examDates: z.array(z.object({
-    subject: z.string(),
-    date: z.string().datetime()
-  })).optional()
-});
+// export const availabilitySchema = z.object({
+//   slots: z.array(timeSlotSchema.extend({
+//     day: z.enum(DAYS_OF_WEEK)
+//   })),
+//   schoolHours: z.object({
+//     start: z.string().regex(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/),
+//     end: z.string().regex(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/)
+//   }).default({ start: "08:30", end: "15:30" }),
+//   examDates: z.array(z.object({
+//     subject: z.string(),
+//     date: z.string().datetime()
+//   })).optional()
+// });
 
 export const preferencesSchema = z.object({
   sessionLength: z.number().min(15).max(120).default(45), // minutes
@@ -99,7 +99,7 @@ export const preferencesSchema = z.object({
 
 export const scheduleRequestSchema = z.object({
   topics: z.array(topicSchema),
-  availability: z.union([availabilitySchema, weeklyAvailabilitySchema]),
+  availability: z.union([weeklyAvailabilitySchema, weeklyAvailabilitySchema]),
   preferences: preferencesSchema.optional()
 });
 
@@ -114,7 +114,7 @@ export const scheduleResponseSchema = z.object({
 export type Session = z.infer<typeof sessionSchema>;
 export type Topic = z.infer<typeof topicSchema>;
 export type TimeSlot = z.infer<typeof timeSlotSchema>;
-export type Availability = z.infer<typeof availabilitySchema>;
+// export type Availability = z.infer<typeof availabilitySchema>;
 export type WeeklyAvailability = z.infer<typeof weeklyAvailabilitySchema>;
 export type Preferences = z.infer<typeof preferencesSchema>;
 export type ScheduleRequest = z.infer<typeof scheduleRequestSchema>;
