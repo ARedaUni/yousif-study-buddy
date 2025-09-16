@@ -1,72 +1,93 @@
 Tech Stack
 
     - Next.js 15.5 with App Router & Turbopack
-    - Google AI SDK (@ai-sdk/google) for AI 
+    - Google AI SDK (@ai-sdk/google) for AI
     scheduling with Gemini Pro
-    - shadcn/ui components for clean, 
-    minimalist UI
-    - Zustand 5.0 for state management with 
+    - shadcn/ui components with premium
+    components for beautiful, mobile-first UI
+    - Framer Motion for smooth animations
+    - Zustand 5.0 for state management with
     persist middleware
-    - shadcn Calendar (react-day-picker) for 
-    timetable visualization
     - date-fns 4.1 for date manipulation
     - Zod for runtime validation
     - TypeScript 5 for type safety
 
-    Better Calendar Options from shadcn
+    Mobile-First Design System
 
-    Option 1: shadcn Calendar Component 
-    (Recommended)
+    Core UI Components (from shadcn):
 
-    - Clean, modern calendar view with built-in
-     month/year pickers
-    - Supports features/events display
-    - Highly customizable with Tailwind
-    - Perfect for showing revision sessions in 
-    a monthly view
+    1. message-dock - AI Assistant Interface
+      - Floating expandable chat dock
+      - Multiple AI characters/personas
+      - Natural language commands
+      - Beautiful gradient animations
+      - Mobile-optimized interactions
 
-    Option 2: shadcn Gantt Component
+    2. dock - Bottom Navigation
+      - iOS-style magnetic dock
+      - Main app navigation
+      - Smooth hover animations
+      - Icon-based navigation
+      - Fixed at bottom for thumb reach
 
-    - Horizontal timeline view
-    - Great for visualizing overlapping study 
-    sessions
-    - Drag-and-drop rescheduling built-in
-    - Better for project-style revision 
-    planning
+    3. animated-modal - Full-Screen Forms
+      - 3D transform animations
+      - Full-screen on mobile
+      - Backdrop blur effects
+      - Touch-friendly close gestures
+      - Perfect for topic/preference inputs
 
-    Option 3: Custom Grid Layout
+    4. 3d-card - Interactive Session Cards
+      - Tilt on hover/touch
+      - Depth perception effects
+      - Swipeable actions
+      - Visual hierarchy through depth
+      - Engaging micro-interactions
 
-    - Build a weekly timetable grid using 
-    shadcn's Card components
-    - Most flexibility for UK school timetable 
-    format
-    - Time slots on Y-axis, days on X-axis
-    - Color-coded subject blocks
+    5. sparkles - AI Generation Effects
+      - Particle animations
+      - Visual feedback for AI actions
+      - Magic feel for generated content
+      - Performance optimized
+      - Customizable colors/density
 
-    Recommended Approach: Hybrid View System
+    Mobile-First View System
 
-    Use multiple visualization modes the user 
-    can switch between:
+    1. Vertical Timeline (Mobile Default)
+      - Single column card layout
+      - Swipe between days
+      - Pull-to-refresh
+      - Infinite scroll
+      - Touch-optimized interactions
 
-    1. Week View - Custom grid layout showing 
-    hourly slots (best for daily planning)
-    2. Month View - shadcn Calendar component 
-    (overview of revision sessions)
-    3. Timeline View - Modified Gantt for exam 
-    countdown visualization
+    2. Mini Calendar View
+      - Compact month view
+      - Tap to see day details
+      - Color-coded session dots
+      - Quick date navigation
+      - Bottom sheet for session details
+
+    3. AI Chat View
+      - Full-screen chat interface
+      - Voice input support (future)
+      - Smart suggestions
+      - Context-aware responses
+      - Session management via chat
 
     Updated Implementation Phases
 
-    Phase 1: Core Setup
+    Phase 1: Mobile-First Foundation
 
-    1. Install shadcn/ui CLI and components:
-      - Calendar, Card, Button, Input, Select, 
-    Dialog, Tabs
-      - Command (for search), Popover, Badge 
-    (for tags)
-    2. Set up project structure and TypeScript 
-    types
-    3. Configure Google AI integration
+    1. Install Premium shadcn Components:
+      - message-dock (AI assistant interface)
+      - dock (bottom navigation)
+      - animated-modal (full-screen forms)
+      - 3d-card (interactive sessions)
+      - sparkles (AI generation effects)
+      - mini-calendar (compact date picker)
+    2. Install Framer Motion for animations
+    3. Set up mobile-first responsive system
+    4. Configure touch gesture handling
 
     Phase 2: Enhanced Data Models
 
@@ -77,7 +98,7 @@ Tech Stack
       topic: string
       startTime: Date
       endTime: Date
-      type: 'new-learning' | 'revision' | 
+      type: 'new-learning' | 'revision' |
     'practice-test'
       difficulty: 1 | 2 | 3 | 4 | 5
       completed: boolean
@@ -107,78 +128,116 @@ Tech Stack
       includeWeekends: boolean
     }
 
-    Phase 3: UI Components with shadcn
+    Phase 3: Mobile-First UI Components
 
-    1. Topic Input 
-      - shadcn Command component for subject 
-    selection
-      - Natural language input with AI parsing
-    2. Availability Manager
-      - Custom time-grid using shadcn Cards
-      - Click-and-drag to select available 
-    times
-      - Visual blocking of school hours
-    3. Timetable Views
-    // Week View - Custom component
-    <WeeklyTimetable sessions={sessions} />
+    1. AI Assistant (message-dock)
+      // Floating AI chat interface
+      <MessageDock
+        characters={[
+          { emoji: "🧙‍♂️", name: "AI Tutor", online: true },
+          { emoji: "📚", name: "Study Buddy", online: true },
+          { emoji: "🎯", name: "Quiz Master", online: false }
+        ]}
+        onMessageSend={handleAICommand}
+        position="bottom"
+        showSparkleButton={true}
+      />
 
-    // Month View - shadcn Calendar
-    <CalendarProvider>
-      <CalendarHeader />
-      <CalendarBody features={sessions} />
-    </CalendarProvider>
+    2. Bottom Navigation (dock)
+      // Main app navigation
+      <Dock className="fixed bottom-4 left-1/2 -translate-x-1/2">
+        <DockItem><DockIcon>🏠</DockIcon><DockLabel>Home</DockLabel></DockItem>
+        <DockItem><DockIcon>📖</DockIcon><DockLabel>Topics</DockLabel></DockItem>
+        <DockItem><DockIcon>📅</DockIcon><DockLabel>Schedule</DockLabel></DockItem>
+        <DockItem><DockIcon>⚙️</DockIcon><DockLabel>Settings</DockLabel></DockItem>
+      </Dock>
 
-    // Timeline - Modified Gantt
-    <GanttProvider range="daily">
-      <GanttTimeline />
-    </GanttProvider>
-    4. Session Cards
-      - shadcn Card with subject color coding
-      - Badge for difficulty level
-      - Progress indicators
+    3. Interactive Session Cards (3d-card)
+      // Touch-friendly session display
+      <CardContainer>
+        <CardBody>
+          <CardItem translateZ={20}>
+            <SessionCard session={session} />
+          </CardItem>
+        </CardBody>
+      </CardContainer>
+
+    4. Full-Screen Modals (animated-modal)
+      // Topic input and preferences
+      <Modal>
+        <ModalTrigger>Add Topic</ModalTrigger>
+        <ModalBody>
+          <ModalContent>
+            <TopicInputForm />
+          </ModalContent>
+        </ModalBody>
+      </Modal>
+
+    5. AI Generation Effects (sparkles)
+      // Visual feedback for AI operations
+      <SparklesCore
+        background="transparent"
+        minSize={0.6}
+        maxSize={1.4}
+        particleDensity={100}
+        className="w-full h-full"
+        particleColor="#3B82F6"
+      />
 
     Phase 4: Google AI Integration
 
     // AI prompts for schedule generation
-    const generateSchedule = async (topics, 
+    const generateSchedule = async (topics,
     availability, preferences) => {
       const prompt = `
         Create an optimal revision timetable:
         Topics: ${JSON.stringify(topics)}
-        Available times: 
+        Available times:
     ${JSON.stringify(availability)}
         Preferences: ${preferences}
-        
+
         Consider:
-        - Spaced repetition for better 
+        - Spaced repetition for better
     retention
         - Mix subjects to avoid fatigue
         - UK Year 10 student (GCSE preparation)
-        - Include breaks using Pomodoro 
+        - Include breaks using Pomodoro
     technique
       `;
-      
+
       return await gemini.generate(prompt);
     }
 
-    Phase 5: Core Features
+    Phase 5: Mobile-First Core Features
 
-    1. Smart Scheduling
-      - Auto-block UK school hours 
-    (8:30am-3:30pm)
-      - Weekend availability preferences
-      - Exam date countdown
-      - Subject rotation for cognitive balance
-    2. Visualizations
-      - Tab navigation between views
-      - Color-coded subjects with legend
-      - Progress tracking per subject
-      - Completion checkboxes
-    3. Interactions
-      - Drag-to-reschedule sessions
-      - Click to mark complete
-      - Quick actions menu
-      - Export to calendar apps
+    1. Touch-First Interactions
+      - Swipe gestures for navigation
+      - Long press for context menus
+      - Pull-to-refresh for data updates
+      - Pinch to zoom on timeline views
+      - Haptic feedback simulation
+      - Touch-friendly hit targets (44px+)
+
+    2. Mobile Navigation Patterns
+      - Bottom sheet for quick actions
+      - Floating action buttons (FAB)
+      - Gesture-based view switching
+      - Thumb-reachable primary actions
+      - One-handed operation support
+
+    3. AI-Powered Mobile Features
+      - Voice commands (future)
+      - Smart suggestions based on context
+      - Automatic mobile-optimized layouts
+      - Intelligent notification timing
+      - Quick AI chat shortcuts
+
+    4. Progressive Web App (PWA)
+      - Offline functionality
+      - Push notifications
+      - Install prompt
+      - Native app-like experience
+      - Background sync for AI updates
 
     Phase 6: Zustand Store Architecture
 
@@ -193,29 +252,29 @@ Tech Stack
           preferences: defaultPreferences,
           isGenerating: false,
           error: null as string | null,
-          
+
           // Session actions
           addSession: (session: RevisionSession) =>
-            set(state => ({ 
+            set(state => ({
               sessions: [...state.sessions, session]
             })),
-          
+
           updateSession: (id: string, updates: Partial<RevisionSession>) =>
             set(state => ({
-              sessions: state.sessions.map(s => 
+              sessions: state.sessions.map(s =>
                 s.id === id ? { ...s, ...updates } : s
               )
             })),
-            
+
           deleteSession: (id: string) =>
             set(state => ({
               sessions: state.sessions.filter(s => s.id !== id)
             })),
-          
+
           // Availability actions
           updateAvailability: (availability: WeeklyAvailability) =>
             set({ availability }),
-          
+
           // AI generation
           generateTimetable: async () => {
             set({ isGenerating: true, error: null });
@@ -235,47 +294,63 @@ Tech Stack
       )
     );
 
-    // Separate UI store for view state
+    // Mobile-optimized UI store
     const useUIStore = create((set) => ({
-      currentView: 'week' as 'week' | 'month' | 'timeline',
+      currentView: 'timeline' as 'timeline' | 'calendar' | 'chat',
       selectedSession: null as string | null,
-      sidebarOpen: true,
-      
+      bottomSheetOpen: false,
+      aiChatOpen: false,
+      isAIGenerating: false,
+
+      // Mobile-first actions
       setCurrentView: (view) => set({ currentView: view }),
       setSelectedSession: (id) => set({ selectedSession: id }),
-      toggleSidebar: () => set(state => ({ sidebarOpen: !state.sidebarOpen }))
+      toggleBottomSheet: () => set(state => ({
+        bottomSheetOpen: !state.bottomSheetOpen
+      })),
+      toggleAIChat: () => set(state => ({
+        aiChatOpen: !state.aiChatOpen
+      })),
+      setAIGenerating: (generating) => set({ isAIGenerating: generating })
     }));
 
-    Enhanced File Structure
+    Enhanced Mobile-First File Structure
 
     /app
       /dashboard
-        /page.tsx (main dashboard with tab navigation)
+        /page.tsx (mobile-first dashboard)
       /api
         /ai
           /generate-schedule/route.ts
           /analyze-topics/route.ts
-      /globals.css (Tailwind + custom styles)
-    
+          /chat/route.ts (AI chat endpoint)
+      /globals.css (mobile-first Tailwind)
+
     /components
-      /ui (shadcn components)
-        /button.tsx, /card.tsx, /calendar.tsx, etc.
-      /timetable
-        /timetable-container.tsx (tabs wrapper)
-        /week-view.tsx (custom grid)
-        /month-view.tsx (shadcn calendar)
-        /timeline-view.tsx (gantt-style)
+      /ui (shadcn base components)
+        /button.tsx, /card.tsx, etc.
+      /ui/shadcn-io (premium components)
+        /message-dock/ (AI assistant)
+        /dock/ (bottom navigation)
+        /animated-modal/ (full-screen modals)
+        /3d-card/ (interactive cards)
+        /sparkles/ (AI effects)
+        /mini-calendar/ (compact calendar)
+      /mobile
+        /bottom-navigation.tsx (main dock)
+        /ai-assistant.tsx (message dock wrapper)
+        /timeline-view.tsx (vertical mobile timeline)
+        /session-card-3d.tsx (interactive session display)
+        /pull-to-refresh.tsx (mobile refresh)
+        /bottom-sheet.tsx (mobile actions sheet)
       /forms
-        /topic-input.tsx (AI-powered input)
-        /availability-grid.tsx (interactive time selector)
-        /preferences-form.tsx
+        /topic-input-modal.tsx (full-screen topic form)
+        /availability-mobile.tsx (touch-friendly time picker)
+        /preferences-modal.tsx (full-screen preferences)
       /session
-        /session-card.tsx (reusable display)
-        /session-dialog.tsx (edit/create modal)
-      /layout
-        /navigation.tsx
-        /sidebar.tsx
-    
+        /session-card-mobile.tsx (touch-optimized)
+        /session-details-sheet.tsx (bottom sheet details)
+
     /lib
       /ai
         /gemini-client.ts (Google AI SDK config)
@@ -289,11 +364,11 @@ Tech Stack
         /use-local-storage.ts
       /types.ts (enhanced TypeScript definitions)
       /constants.ts (subjects, colors, defaults)
-    
+
     /store
       /revision-store.ts (main data store)
       /ui-store.ts (view state)
-    
+
     /styles
       /globals.css
 
@@ -335,37 +410,44 @@ Tech Stack
       - E2E tests for critical user flows
       - Storybook for component documentation
 
-    Key UI Improvements
+    Mobile-First Design Philosophy
 
-    1. Minimalist Design
-      - Clean white/light gray background
-      - Subtle shadows and borders (shadow-sm)
-      - Primary: blue-600, Secondary: gray-500
-      - Typography: Inter font with clear hierarchy
+    1. Glass Morphism Visual Design
+      - Frosted glass effect with backdrop-blur
+      - Subtle gradients and depth
+      - Primary: Blue-500/600 for AI features
+      - Vibrant accent colors for interactions
+      - Clean typography with perfect mobile sizing
 
-    2. Advanced Calendar Features
-      - Multi-view system with smooth transitions
-      - Drag-and-drop rescheduling
-      - Color-coded subject blocks
-      - Progress indicators and completion states
-      - Mobile-first responsive design
+    2. Touch-First Interaction Design
+      - 44px+ touch targets for accessibility
+      - Swipe gestures for primary navigation
+      - Long press for contextual actions
+      - Pull-to-refresh for data updates
+      - Haptic feedback for important actions
 
-    3. Smart Features
-      - Pre-configured UK Year 10 schedule
-      - GCSE subjects with color mapping
-      - Intelligent session length suggestions
-      - Automatic break scheduling
-      - Spaced repetition algorithms
-      - Exam countdown with priority weighting
+    3. AI-Centered Mobile Experience
+      - Always-accessible AI assistant dock
+      - Natural language commands via chat
+      - Visual AI feedback with sparkles/particles
+      - Smart suggestions contextual to current view
+      - Voice input support (future enhancement)
 
-    4. User Experience
-      - Natural language topic input
-      - One-click availability selection
-      - Contextual help tooltips
-      - Undo/redo functionality
-      - Export to popular calendar apps
+    4. Performance-Optimized Mobile Features
+      - Lazy loading for smooth scrolling
+      - Optimistic UI updates
+      - Smooth 60fps animations
+      - Efficient bundle splitting
+      - Progressive enhancement approach
 
-    This architecture ensures scalability, 
-    maintainability, and excellent developer 
-    experience while delivering a beautiful, 
-    fast interface perfect for students.
+    5. Mobile-Native Patterns
+      - Bottom sheet modals for quick actions
+      - Floating action buttons for primary tasks
+      - Thumb-reachable navigation areas
+      - One-handed operation support
+      - Progressive disclosure of complexity
+
+    This mobile-first architecture creates an
+    intuitive, beautiful, and powerful AI revision
+    assistant that feels native on mobile while
+    providing excellent desktop fallbacks.
