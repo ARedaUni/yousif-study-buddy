@@ -1,15 +1,17 @@
 Tech Stack
 
-    - Next.js with App Router
+    - Next.js 15.5 with App Router & Turbopack
     - Google AI SDK (@ai-sdk/google) for AI 
-    scheduling
+    scheduling with Gemini Pro
     - shadcn/ui components for clean, 
     minimalist UI
-    - Zustand for state management
-    - shadcn Calendar for timetable 
-    visualization (much nicer than 
-    react-big-calendar!)
-    - date-fns for date manipulation
+    - Zustand 5.0 for state management with 
+    persist middleware
+    - shadcn Calendar (react-day-picker) for 
+    timetable visualization
+    - date-fns 4.1 for date manipulation
+    - Zod for runtime validation
+    - TypeScript 5 for type safety
 
     Better Calendar Options from shadcn
 
@@ -66,8 +68,9 @@ Tech Stack
     types
     3. Configure Google AI integration
 
-    Phase 2: Data Models
+    Phase 2: Enhanced Data Models
 
+    // Core types (in lib/types.ts)
     interface RevisionSession {
       id: string
       subject: string
@@ -76,17 +79,32 @@ Tech Stack
       endTime: Date
       type: 'new-learning' | 'revision' | 
     'practice-test'
-      difficulty: 1-5
+      difficulty: 1 | 2 | 3 | 4 | 5
       completed: boolean
       notes?: string
+      color?: string
+      examDate?: Date
     }
 
     interface WeeklyAvailability {
       monday: TimeSlot[]
       tuesday: TimeSlot[]
-      // ... etc
-      defaultSchoolHours: { start: "08:30", 
-    end: "15:30" }
+      wednesday: TimeSlot[]
+      thursday: TimeSlot[]
+      friday: TimeSlot[]
+      saturday: TimeSlot[]
+      sunday: TimeSlot[]
+      schoolHours: { start: string, end: string }
+      examDates?: { subject: string, date: Date }[]
+    }
+
+    interface StudyPreferences {
+      sessionLength: 25 | 45 | 60 | 90
+      breakLength: 5 | 10 | 15 | 20
+      maxSessionsPerDay: number
+      studyStyle: 'intensive' | 'relaxed' | 'balanced'
+      preferredTimes: ('morning' | 'afternoon' | 'evening')[]
+      includeWeekends: boolean
     }
 
     Phase 3: UI Components with shadcn
@@ -162,72 +180,192 @@ Tech Stack
       - Quick actions menu
       - Export to calendar apps
 
-    Phase 6: Memory & State Management
+    Phase 6: Zustand Store Architecture
 
-    // Zustand store structure
-    const useRevisionStore = create((set) => ({
-      sessions: [],
-      topics: [],
-      availability: {},
-      preferences: {},
+    // Main revision store (store/revision-store.ts)
+    const useRevisionStore = create(
+      persist(
+        (set, get) => ({
+          // State
+          sessions: [] as RevisionSession[],
+          topics: [] as Topic[],
+          availability: null as WeeklyAvailability | null,
+          preferences: defaultPreferences,
+          isGenerating: false,
+          error: null as string | null,
+          
+          // Session actions
+          addSession: (session: RevisionSession) =>
+            set(state => ({ 
+              sessions: [...state.sessions, session]
+            })),
+          
+          updateSession: (id: string, updates: Partial<RevisionSession>) =>
+            set(state => ({
+              sessions: state.sessions.map(s => 
+                s.id === id ? { ...s, ...updates } : s
+              )
+            })),
+            
+          deleteSession: (id: string) =>
+            set(state => ({
+              sessions: state.sessions.filter(s => s.id !== id)
+            })),
+          
+          // Availability actions
+          updateAvailability: (availability: WeeklyAvailability) =>
+            set({ availability }),
+          
+          // AI generation
+          generateTimetable: async () => {
+            set({ isGenerating: true, error: null });
+            try {
+              const response = await generateSchedule(
+                get().topics,
+                get().availability,
+                get().preferences
+              );
+              set({ sessions: response.sessions, isGenerating: false });
+            } catch (error) {
+              set({ error: error.message, isGenerating: false });
+            }
+          }
+        }),
+        { name: 'revision-store' }
+      )
+    );
+
+    // Separate UI store for view state
+    const useUIStore = create((set) => ({
+      currentView: 'week' as 'week' | 'month' | 'timeline',
+      selectedSession: null as string | null,
+      sidebarOpen: true,
       
-      // Actions
-      addSession: (session) => set(...),
-      updateAvailability: (availability) => 
-    set(...),
-      generateTimetable: async () => {...}
-    }))
+      setCurrentView: (view) => set({ currentView: view }),
+      setSelectedSession: (id) => set({ selectedSession: id }),
+      toggleSidebar: () => set(state => ({ sidebarOpen: !state.sidebarOpen }))
+    }));
 
-    File Structure
+    Enhanced File Structure
 
     /app
       /dashboard
-        /page.tsx (main dashboard with tabs)
+        /page.tsx (main dashboard with tab navigation)
       /api
         /ai
           /generate-schedule/route.ts
           /analyze-topics/route.ts
+      /globals.css (Tailwind + custom styles)
+    
     /components
       /ui (shadcn components)
+        /button.tsx, /card.tsx, /calendar.tsx, etc.
       /timetable
-        /week-view.tsx
-        /month-view.tsx
-        /timeline-view.tsx
-      /topic-input.tsx
-      /availability-grid.tsx
-      /session-card.tsx
+        /timetable-container.tsx (tabs wrapper)
+        /week-view.tsx (custom grid)
+        /month-view.tsx (shadcn calendar)
+        /timeline-view.tsx (gantt-style)
+      /forms
+        /topic-input.tsx (AI-powered input)
+        /availability-grid.tsx (interactive time selector)
+        /preferences-form.tsx
+      /session
+        /session-card.tsx (reusable display)
+        /session-dialog.tsx (edit/create modal)
+      /layout
+        /navigation.tsx
+        /sidebar.tsx
+    
     /lib
       /ai
-        /prompts.ts
-        /gemini-client.ts
+        /gemini-client.ts (Google AI SDK config)
+        /prompts.ts (structured prompts)
       /utils
-        /dates.ts
-        /colors.ts
-      /types.ts
+        /dates.ts (date-fns helpers)
+        /colors.ts (subject color mapping)
+        /schedule.ts (validation & optimization)
+      /hooks
+        /use-debounce.ts
+        /use-local-storage.ts
+      /types.ts (enhanced TypeScript definitions)
+      /constants.ts (subjects, colors, defaults)
+    
     /store
-      /revision-store.ts
+      /revision-store.ts (main data store)
+      /ui-store.ts (view state)
+    
+    /styles
+      /globals.css
+
+    Engineering Best Practices
+
+    1. Type Safety
+      - Full TypeScript coverage with strict mode
+      - Zod schemas for runtime validation
+      - Proper generic types for reusable components
+      - Type-safe Zustand store with immer
+
+    2. Performance Optimization
+      - React.memo for expensive components
+      - useMemo for complex calculations
+      - Lazy loading for calendar views
+      - Debounced search and input handlers
+
+    3. State Management
+      - Zustand with persist middleware
+      - Separate stores for data vs UI state
+      - Optimistic updates with rollback
+      - Local state for form handling
+
+    4. Error Handling
+      - Error boundaries for component failures
+      - Proper error states in UI
+      - Validation feedback for forms
+      - API error handling with retries
+
+    5. Accessibility
+      - Proper ARIA labels
+      - Keyboard navigation support
+      - Focus management in modals
+      - Screen reader friendly
+
+    6. Testing Strategy
+      - Unit tests for utilities
+      - Component testing with React Testing Library
+      - E2E tests for critical user flows
+      - Storybook for component documentation
 
     Key UI Improvements
 
     1. Minimalist Design
       - Clean white/light gray background
-      - Subtle shadows and borders
-      - 2-3 accent colors max
-      - Clear typography hierarchy
-    2. Better Calendar Visualization
-      - shadcn Calendar for monthly overview
-      - Custom week grid for detailed planning
-      - Smooth animations and transitions
-      - Mobile-responsive design
-    3. Smart Defaults
-      - Pre-configured for UK Year 10 schedule
-      - Common GCSE subjects pre-loaded
-      - Standard revision session lengths (25, 
-    45, 60 min)
-      - Automatic break scheduling
+      - Subtle shadows and borders (shadow-sm)
+      - Primary: blue-600, Secondary: gray-500
+      - Typography: Inter font with clear hierarchy
 
-    This approach uses shadcn's beautiful, 
-    pre-styled components instead of 
-    react-big-calendar, resulting in a much 
-    cleaner, more modern interface that's 
-    perfect for students.
+    2. Advanced Calendar Features
+      - Multi-view system with smooth transitions
+      - Drag-and-drop rescheduling
+      - Color-coded subject blocks
+      - Progress indicators and completion states
+      - Mobile-first responsive design
+
+    3. Smart Features
+      - Pre-configured UK Year 10 schedule
+      - GCSE subjects with color mapping
+      - Intelligent session length suggestions
+      - Automatic break scheduling
+      - Spaced repetition algorithms
+      - Exam countdown with priority weighting
+
+    4. User Experience
+      - Natural language topic input
+      - One-click availability selection
+      - Contextual help tooltips
+      - Undo/redo functionality
+      - Export to popular calendar apps
+
+    This architecture ensures scalability, 
+    maintainability, and excellent developer 
+    experience while delivering a beautiful, 
+    fast interface perfect for students.
