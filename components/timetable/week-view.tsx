@@ -6,7 +6,14 @@ import { Button } from '@/components/ui/button';
 import { useRevisionStore } from '@/store/revision-store';
 import { SESSION_TYPE_COLORS, DIFFICULTY_COLORS } from '@/lib/schema';
 import { format, startOfWeek, addDays, isSameDay, parseISO } from 'date-fns';
-import { Clock, BookOpen, Plus, Sparkles, Calendar, ArrowRight } from 'lucide-react';
+import {
+  Clock,
+  BookOpen,
+  Plus,
+  Sparkles,
+  Calendar,
+  ArrowRight,
+} from 'lucide-react';
 
 const HOURS = Array.from({ length: 15 }, (_, i) => i + 7); // 7 AM to 9 PM
 const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
@@ -18,7 +25,7 @@ export function WeekView() {
 
   const getSessionsForDayAndHour = (dayIndex: number, hour: number) => {
     const day = addDays(weekStart, dayIndex);
-    return sessions.filter(session => {
+    return sessions.filter((session) => {
       const sessionStart = new Date(session.startTime);
       return isSameDay(sessionStart, day) && sessionStart.getHours() === hour;
     });
@@ -62,10 +69,12 @@ export function WeekView() {
               const date = addDays(weekStart, index);
               const isToday = isSameDay(date, today);
               return (
-                <div 
-                  key={day} 
+                <div
+                  key={day}
                   className={`p-4 text-center border-r border-gray-200 ${
-                    isToday ? 'bg-blue-50 text-blue-900 font-semibold' : 'bg-gray-50'
+                    isToday
+                      ? 'bg-blue-50 text-blue-900 font-semibold'
+                      : 'bg-gray-50'
                   }`}
                 >
                   <div className="text-sm font-medium">{day}</div>
@@ -78,40 +87,52 @@ export function WeekView() {
           </div>
 
           {/* Time rows */}
-          {HOURS.map(hour => (
-            <div key={hour} className="grid grid-cols-8 border-b border-gray-100 min-h-[4rem]">
+          {HOURS.map((hour) => (
+            <div
+              key={hour}
+              className="grid grid-cols-8 border-b border-gray-100 min-h-[4rem]"
+            >
               {/* Time column */}
               <div className="p-3 border-r border-gray-200 bg-gray-50 text-xs text-gray-600 font-medium">
                 {formatTime(hour)}
               </div>
-              
+
               {/* Day columns */}
               {DAYS.map((_, dayIndex) => {
                 const daySessions = getSessionsForDayAndHour(dayIndex, hour);
                 return (
-                  <div key={dayIndex} className="p-1 border-r border-gray-200 min-h-[4rem]">
-                    {daySessions.map(session => (
+                  <div
+                    key={dayIndex}
+                    className="p-1 border-r border-gray-200 min-h-[4rem]"
+                  >
+                    {daySessions.map((session) => (
                       <div
                         key={session.id}
                         className={`p-2 rounded-md mb-1 text-xs cursor-pointer hover:shadow-sm transition-shadow ${
                           SESSION_TYPE_COLORS[session.type]
                         } ${session.completed ? 'opacity-60' : ''}`}
                       >
-                        <div className="font-medium truncate" title={session.subject}>
+                        <div
+                          className="font-medium truncate"
+                          title={session.subject}
+                        >
                           {session.subject}
                         </div>
-                        <div className="text-xs opacity-80 truncate" title={session.topic}>
+                        <div
+                          className="text-xs opacity-80 truncate"
+                          title={session.topic}
+                        >
                           {session.topic}
                         </div>
                         <div className="flex items-center justify-between mt-1">
                           <span className="text-xs">
-                            {format(new Date(session.startTime), 'HH:mm')} - 
+                            {format(new Date(session.startTime), 'HH:mm')} -
                             {format(new Date(session.endTime), 'HH:mm')}
                           </span>
                           {session.difficulty && (
-                            <Badge 
-                              variant="secondary" 
-                              className={`text-xs px-1 py-0 ${DIFFICULTY_COLORS[session.difficulty]}`}
+                            <Badge
+                              variant="secondary"
+                              className={`text-xs px-1 py-0 ${DIFFICULTY_COLORS[session.difficulty as keyof typeof DIFFICULTY_COLORS]}`}
                             >
                               {session.difficulty}
                             </Badge>
@@ -133,16 +154,14 @@ export function WeekView() {
         </CardContent>
       </Card>
 
-      {sessions.length === 0 && (
-        <EmptyWeekState />
-      )}
+      {sessions.length === 0 && <EmptyWeekState />}
     </div>
   );
 }
 
 function EmptyWeekState() {
   const { topics } = useRevisionStore();
-  
+
   return (
     <Card className="border-2 border-dashed border-gray-200 bg-gradient-to-br from-blue-50 to-indigo-50">
       <CardContent className="text-center py-16 px-8">
@@ -153,16 +172,15 @@ function EmptyWeekState() {
             </div>
             <Calendar className="h-16 w-16 mx-auto text-blue-500 relative z-10" />
           </div>
-          
+
           <div className="space-y-3">
             <h3 className="text-xl font-bold text-gray-900">
               Your weekly timetable awaits
             </h3>
             <p className="text-gray-600 leading-relaxed">
-              {topics.length === 0 
-                ? "Start by adding your study topics, then generate an AI-powered timetable tailored to your schedule."
-                : `Great! You have ${topics.length} topic${topics.length > 1 ? 's' : ''} ready. Generate your timetable to see your weekly schedule.`
-              }
+              {topics.length === 0
+                ? 'Start by adding your study topics, then generate an AI-powered timetable tailored to your schedule.'
+                : `Great! You have ${topics.length} topic${topics.length > 1 ? 's' : ''} ready. Generate your timetable to see your weekly schedule.`}
             </p>
           </div>
 
@@ -180,7 +198,10 @@ function EmptyWeekState() {
               </>
             ) : (
               <>
-                <Button size="lg" className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700">
+                <Button
+                  size="lg"
+                  className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700"
+                >
                   <Sparkles className="h-4 w-4 mr-2" />
                   Generate Timetable
                 </Button>
