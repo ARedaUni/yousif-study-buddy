@@ -47,14 +47,18 @@ export function TopicInputModal() {
   const handleSaveTopics = () => {
     if (!selectedSubject || topicList.length === 0) return;
 
-    const newTopicEntry: Topic = {
-      subject: selectedSubject,
-      topics: topicList,
-      difficulty,
-      priority,
-    };
-
-    addTopic(newTopicEntry);
+    // Create individual topics for each topic name
+    topicList.forEach((topicName) => {
+      const newTopicEntry: Topic = {
+        id: crypto.randomUUID(),
+        subject: selectedSubject,
+        name: topicName,
+        addedAt: new Date(),
+        difficulty,
+        priority,
+      };
+      addTopic(newTopicEntry);
+    });
 
     // Reset form
     setSelectedSubject('');
@@ -304,9 +308,11 @@ export function TopicInputModal() {
                           {topic.subject}
                         </h4>
                         <div className="flex items-center gap-2">
-                          <Badge className={getPriorityColor(topic.priority)}>
-                            {topic.priority}
-                          </Badge>
+                          {topic.priority && (
+                            <Badge className={getPriorityColor(topic.priority)}>
+                              {topic.priority}
+                            </Badge>
+                          )}
                           {topic.difficulty && (
                             <div className="flex gap-0.5">
                               {getDifficultyStars(topic.difficulty)}
@@ -315,11 +321,9 @@ export function TopicInputModal() {
                         </div>
                       </div>
                       <div className="flex flex-wrap gap-1">
-                        {topic.topics.map((t, i) => (
-                          <Badge key={i} variant="outline" className="text-xs">
-                            {t}
-                          </Badge>
-                        ))}
+                        <Badge variant="outline" className="text-xs">
+                          {topic.name}
+                        </Badge>
                       </div>
                     </motion.div>
                   ))}

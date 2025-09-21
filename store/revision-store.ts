@@ -1,200 +1,92 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import {
-  Session,
-  Topic,
-  WeeklyAvailability,
-  Preferences,
-  preferencesSchema,
-} from '@/lib/schema';
+import { Topic, Session } from '@/lib/schema';
 
 interface RevisionState {
-  // State
-  sessions: Session[];
   topics: Topic[];
-  availability: WeeklyAvailability | null;
-  preferences: Preferences;
+  sessions: Session[];
   isGenerating: boolean;
   error: string | null;
 
-  // Session actions
-  addSession: (session: Session) => void;
-  updateSession: (id: string, updates: Partial<Session>) => void;
-  deleteSession: (id: string) => void;
-  toggleSessionComplete: (id: string) => void;
-
-  // Topic actions
   addTopic: (topic: Topic) => void;
-  updateTopic: (index: number, updates: Partial<Topic>) => void;
-  deleteTopic: (index: number) => void;
+  removeTopic: (id: string) => void;
+  clearTopics: () => void;
 
-  // Availability actions
-  updateAvailability: (availability: WeeklyAvailability) => void;
+  setSessions: (sessions: Session[]) => void;
+  clearSessions: () => void;
 
-  // Preferences actions
-  updatePreferences: (preferences: Partial<Preferences>) => void;
-
-  // AI generation
   generateTimetable: () => Promise<void>;
-
-  // Utility actions
-  clearError: () => void;
-  reset: () => void;
+  setGenerating: (generating: boolean) => void;
+  setError: (error: string | null) => void;
 }
 
-const defaultPreferences: Preferences = preferencesSchema.parse({});
+const SUBJECT_COLORS = {
+  Mathematics: '#3B82F6',
+  'English Literature': '#EF4444',
+  'English Language': '#DC2626',
+  'Science (Biology)': '#10B981',
+  'Science (Chemistry)': '#059669',
+  'Science (Physics)': '#0D9488',
+  History: '#F59E0B',
+  Geography: '#84CC16',
+  French: '#8B5CF6',
+  Spanish: '#A855F7',
+  'Art & Design': '#EC4899',
+  Music: '#F97316',
+  PE: '#06B6D4',
+  'Computer Science': '#6366F1',
+  'Religious Studies': '#64748B',
+};
 
 export const useRevisionStore = create<RevisionState>()(
   persist(
     (set, get) => ({
-      // Initial state
-      sessions: [
-        {
-          id: '1',
-          subject: 'Mathematics',
-          topic: 'Quadratic Equations',
-          startTime: new Date().toISOString(),
-          endTime: new Date(Date.now() + 60 * 60 * 1000).toISOString(),
-          type: 'new-learning' as const,
-          difficulty: 3,
-          completed: false,
-          notes: 'Focus on completing the square method',
-        },
-        {
-          id: '2',
-          subject: 'English Literature',
-          topic: 'Romeo and Juliet Analysis',
-          startTime: new Date(Date.now() + 2 * 60 * 60 * 1000).toISOString(),
-          endTime: new Date(Date.now() + 3 * 60 * 60 * 1000).toISOString(),
-          type: 'revision' as const,
-          difficulty: 2,
-          completed: true,
-          notes: 'Character development and themes',
-        },
-        {
-          id: '3',
-          subject: 'Science (Physics)',
-          topic: 'Forces and Motion',
-          startTime: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
-          endTime: new Date(Date.now() + 25 * 60 * 60 * 1000).toISOString(),
-          type: 'practice-test' as const,
-          difficulty: 4,
-          completed: false,
-          notes: 'Practice calculations and diagrams',
-        },
-      ],
-      topics: [
-        {
-          subject: 'Mathematics',
-          topics: ['Quadratic Equations', 'Trigonometry', 'Statistics'],
-          difficulty: 3,
-          priority: 'high' as const,
-        },
-        {
-          subject: 'English Literature',
-          topics: ['Romeo and Juliet', 'Macbeth', 'Poetry Analysis'],
-          difficulty: 2,
-          priority: 'medium' as const,
-        },
-        {
-          subject: 'Science (Physics)',
-          topics: ['Forces and Motion', 'Energy', 'Waves'],
-          difficulty: 4,
-          priority: 'high' as const,
-        },
-        {
-          subject: 'History',
-          topics: ['World War I', 'Industrial Revolution', 'Cold War'],
-          difficulty: 2,
-          priority: 'low' as const,
-        },
-      ],
-      availability: null,
-      preferences: defaultPreferences,
+      topics: [],
+      sessions: [],
       isGenerating: false,
       error: null,
 
-      // Session actions
-      addSession: (session: Session) =>
-        set((state) => ({
-          sessions: [...state.sessions, session],
-        })),
-
-      updateSession: (id: string, updates: Partial<Session>) =>
-        set((state) => ({
-          sessions: state.sessions.map((s) =>
-            s.id === id ? { ...s, ...updates } : s
-          ),
-        })),
-
-      deleteSession: (id: string) =>
-        set((state) => ({
-          sessions: state.sessions.filter((s) => s.id !== id),
-        })),
-
-      toggleSessionComplete: (id: string) =>
-        set((state) => ({
-          sessions: state.sessions.map((s) =>
-            s.id === id ? { ...s, completed: !s.completed } : s
-          ),
-        })),
-
-      // Topic actions
-      addTopic: (topic: Topic) =>
+      addTopic: (topic: Topic) => {
         set((state) => ({
           topics: [...state.topics, topic],
-        })),
+        }));
+      },
 
-      updateTopic: (index: number, updates: Partial<Topic>) =>
+      removeTopic: (id: string) => {
         set((state) => ({
-          topics: state.topics.map((t, i) =>
-            i === index ? { ...t, ...updates } : t
-          ),
-        })),
+          topics: state.topics.filter((topic) => topic.id !== id),
+        }));
+      },
 
-      deleteTopic: (index: number) =>
-        set((state) => ({
-          topics: state.topics.filter((_, i) => i !== index),
-        })),
+      clearTopics: () => {
+        set({ topics: [] });
+      },
 
-      // Availability actions
-      updateAvailability: (availability: WeeklyAvailability) =>
-        set({ availability }),
+      setSessions: (sessions: Session[]) => {
+        set({ sessions });
+      },
 
-      // Preferences actions
-      updatePreferences: (preferences: Partial<Preferences>) =>
-        set((state) => ({
-          preferences: { ...state.preferences, ...preferences },
-        })),
+      clearSessions: () => {
+        set({ sessions: [] });
+      },
 
-      // AI generation
       generateTimetable: async () => {
+        const { topics } = get();
+
+        if (topics.length === 0) {
+          set({ error: 'Please add some topics first' });
+          return;
+        }
+
         set({ isGenerating: true, error: null });
+
         try {
-          const { topics, availability, preferences } = get();
-
-          if (!availability) {
-            throw new Error(
-              'Availability must be set before generating timetable'
-            );
-          }
-
-          if (topics.length === 0) {
-            throw new Error(
-              'At least one topic must be added before generating timetable'
-            );
-          }
-
-          const response = await fetch('/api/ai/generate-schedule', {
+          const response = await fetch('/api/ai/generate-timetable', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
             },
-            body: JSON.stringify({
-              topics,
-              availability,
-              preferences,
-            }),
+            body: JSON.stringify({ topics }),
           });
 
           if (!response.ok) {
@@ -205,8 +97,18 @@ export const useRevisionStore = create<RevisionState>()(
 
           const data = await response.json();
 
+          // Convert the response to our Session format
+          const sessions: Session[] = data.sessions.map((session: any) => ({
+            ...session,
+            startTime: new Date(session.startTime),
+            endTime: new Date(session.endTime),
+            color:
+              SUBJECT_COLORS[session.subject as keyof typeof SUBJECT_COLORS] ||
+              '#6B7280',
+          }));
+
           set({
-            sessions: data.sessions,
+            sessions,
             isGenerating: false,
           });
         } catch (error) {
@@ -220,26 +122,19 @@ export const useRevisionStore = create<RevisionState>()(
         }
       },
 
-      // Utility actions
-      clearError: () => set({ error: null }),
+      setGenerating: (generating: boolean) => {
+        set({ isGenerating: generating });
+      },
 
-      reset: () =>
-        set({
-          sessions: [],
-          topics: [],
-          availability: null,
-          preferences: defaultPreferences,
-          isGenerating: false,
-          error: null,
-        }),
+      setError: (error: string | null) => {
+        set({ error });
+      },
     }),
     {
       name: 'revision-store',
       partialize: (state) => ({
-        sessions: state.sessions,
         topics: state.topics,
-        availability: state.availability,
-        preferences: state.preferences,
+        sessions: state.sessions,
       }),
     }
   )
