@@ -1,25 +1,9 @@
-import { google } from '@ai-sdk/google';
-import { generateObject } from 'ai';
 import { NextRequest, NextResponse } from 'next/server';
-import { z } from 'zod';
-
-const sessionSchema = z.object({
-  id: z.string(),
-  subject: z.string(),
-  topic: z.string(),
-  startTime: z.string(),
-  endTime: z.string(),
-  type: z.enum(['new-learning', 'revision', 'practice-test']),
-});
-
-const timetableSchema = z.object({
-  sessions: z.array(sessionSchema),
-  message: z.string(),
-});
+import { timetableAgent } from '@/lib/ai/timetable-agent';
 
 export async function POST(request: NextRequest) {
   try {
-    const { topics } = await request.json();
+    const { topics, availability, preferences } = await request.json();
 
     if (!topics || topics.length === 0) {
       return NextResponse.json(
@@ -28,46 +12,61 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Format topics for the prompt
+    // Default availability if not provided
+    const defaultAvailability = availability || {
+      monday: [{ start: '16:00', end: '20:00' }],
+      tuesday: [{ start: '16:00', end: '20:00' }],
+      wednesday: [{ start: '16:00', end: '20:00' }],
+      thursday: [{ start: '16:00', end: '20:00' }],
+      friday: [{ start: '16:00', end: '20:00' }],
+      saturday: [{ start: '10:00', end: '18:00' }],
+      sunday: [{ start: '10:00', end: '18:00' }],
+      schoolHours: { start: '09:00', end: '15:30' },
+    };
+
+    // Default preferences if not provided
+    const defaultPreferences = preferences || {
+      sessionLength: 45,
+      breakLength: 15,
+      maxSessionsPerDay: 4,
+      studyStyle: 'balanced',
+      preferredTimes: ['afternoon', 'evening'],
+      includeWeekends: true,
+    };
+
+    // Format topics for the agent
     const topicsList = topics
       .map((t: any) => `${t.subject}: ${t.name}`)
       .join('\n');
 
-    const prompt = `You are an AI tutor creating a revision timetable for a UK Year 10 student (age 15-16) preparing for GCSEs.
+    const prompt = `Create an intelligent revision timetable for a UK Year 10 student preparing for GCSEs.
 
-Student's topics to study:
+Topics to study:
 ${topicsList}
 
-Create a balanced 2-week revision timetable with the following requirements:
-- Sessions between 4:00 PM - 8:00 PM on weekdays (after school)
-- Weekend sessions between 10:00 AM - 6:00 PM 
-- Each session should be 45 minutes long
-- Include 15-minute breaks between sessions
-- Use spaced repetition: review topics again after 1 day, 3 days, and 1 week
-- Mix different subjects to avoid fatigue
-- Include different session types: new-learning, revision, practice-test
-- Sessions should be scheduled for the next 2 weeks starting from today
-- Generate realistic study times that a teenager can follow
+Available study times:
+${JSON.stringify(defaultAvailability, null, 2)}
 
-For each session, provide:
-- A unique ID
-- Subject name (exactly as provided)
-- Specific topic name
-- Start time (ISO format)
-- End time (ISO format) 
-- Session type (new-learning, revision, or practice-test)
+Study preferences:
+${JSON.stringify(defaultPreferences, null, 2)}
 
-Also provide a brief encouraging message about the timetable.
+Use your tools to:
+1. Analyze each topic's difficulty and time requirements
+2. Calculate optimal spaced repetition schedules
+3. Distribute sessions across available time slots
+4. Resolve any time conflicts
+5. Generate appropriate break schedules
+6. Optimize for cognitive load and variety
 
-Current date: ${new Date().toISOString()}`;
+Create a 2-week timetable starting from today (${new Date().toISOString()}) that maximizes learning effectiveness while being realistic for a teenager to follow.
 
-    const { object } = await generateObject({
-      model: google('gemini-2.0-flash-001'),
+Provide a complete schedule with sessions, timing, and educational rationale.`;
+
+    const result = await timetableAgent.generate({
       prompt,
-      schema: timetableSchema,
     });
 
-    return NextResponse.json(object);
+    return NextResponse.json(result.experimental_output);
   } catch (error) {
     console.error('Error generating timetable:', error);
     return NextResponse.json(
