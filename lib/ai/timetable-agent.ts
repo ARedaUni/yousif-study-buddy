@@ -50,6 +50,25 @@ Your approach:
 5. Generate appropriate break schedules for sustained learning
 6. Ensure all constraints (school hours, availability, preferences) are met
 
+CRITICAL OUTPUT FORMAT REQUIREMENTS:
+- difficulty: MUST be an integer from 1 to 5 (1=very easy, 2=easy, 3=medium, 4=hard, 5=very hard)
+- startTime: MUST be a full ISO 8601 datetime string (e.g., "2024-12-15T16:00:00Z")
+- endTime: MUST be a full ISO 8601 datetime string (e.g., "2024-12-15T16:45:00Z")
+- id: Unique string identifier for each session
+- type: Must be exactly one of: "new-learning", "revision", or "practice-test"
+
+Example session format:
+{
+  "id": "math-algebra-1",
+  "subject": "Mathematics",
+  "topic": "Algebra",
+  "startTime": "2024-12-15T16:00:00Z",
+  "endTime": "2024-12-15T16:45:00Z",
+  "type": "new-learning",
+  "difficulty": 3,
+  "notes": "Introduction to algebraic expressions"
+}
+
 Always prioritize educational effectiveness while creating realistic, achievable schedules that students can actually follow.`,
 
   tools: {
