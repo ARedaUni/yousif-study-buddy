@@ -106,59 +106,55 @@ export function TimetableDisplay() {
                       <p className="text-sm">No sessions scheduled</p>
                     </div>
                   ) : (
-                    daySessions
-                      .sort(
-                        (a, b) => a.startTime.getTime() - b.startTime.getTime()
-                      )
-                      .map((session) => {
-                        const IconComponent = sessionTypeIcons[session.type];
-                        return (
-                          <motion.div
-                            key={session.id}
-                            initial={{ opacity: 0, x: -20 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            className="group"
+                    daySessions.map((session) => {
+                      const IconComponent = sessionTypeIcons[session.type];
+                      return (
+                        <motion.div
+                          key={session.id}
+                          initial={{ opacity: 0, x: -20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          className="group"
+                        >
+                          <div
+                            className="p-3 rounded-lg border transition-all hover:shadow-md cursor-pointer"
+                            style={{
+                              borderLeftColor: session.color,
+                              borderLeftWidth: '4px',
+                            }}
                           >
-                            <div
-                              className="p-3 rounded-lg border transition-all hover:shadow-md cursor-pointer"
-                              style={{
-                                borderLeftColor: session.color,
-                                borderLeftWidth: '4px',
-                              }}
-                            >
-                              <div className="flex items-start justify-between mb-2">
-                                <div className="flex items-center gap-2">
-                                  <IconComponent
-                                    className="h-4 w-4"
-                                    style={{ color: session.color }}
-                                  />
-                                  <h4 className="font-medium text-sm">
-                                    {session.subject}
-                                  </h4>
-                                </div>
-                                <Badge
-                                  variant="outline"
-                                  className={`text-xs ${sessionTypeColors[session.type]}`}
-                                >
-                                  {session.type.replace('-', ' ')}
-                                </Badge>
+                            <div className="flex items-start justify-between mb-2">
+                              <div className="flex items-center gap-2">
+                                <IconComponent
+                                  className="h-4 w-4"
+                                  style={{ color: session.color }}
+                                />
+                                <h4 className="font-medium text-sm">
+                                  {session.subject}
+                                </h4>
                               </div>
-
-                              <p className="text-sm text-muted-foreground mb-2">
-                                {session.topic}
-                              </p>
-
-                              <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                                <Clock className="h-3 w-3" />
-                                <span>
-                                  {format(session.startTime, 'HH:mm')} -{' '}
-                                  {format(session.endTime, 'HH:mm')}
-                                </span>
-                              </div>
+                              <Badge
+                                variant="outline"
+                                className={`text-xs ${sessionTypeColors[session.type]}`}
+                              >
+                                {session.type.replace('-', ' ')}
+                              </Badge>
                             </div>
-                          </motion.div>
-                        );
-                      })
+
+                            <p className="text-sm text-muted-foreground mb-2">
+                              {session.topic}
+                            </p>
+
+                            <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                              <Clock className="h-3 w-3" />
+                              <span>
+                                {format(session.startTime, 'HH:mm')} -{' '}
+                                {format(session.endTime, 'HH:mm')}
+                              </span>
+                            </div>
+                          </div>
+                        </motion.div>
+                      );
+                    })
                   )}
                 </CardContent>
               </Card>
