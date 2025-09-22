@@ -1,13 +1,6 @@
 import { Experimental_Agent as Agent, stepCountIs, Output } from 'ai';
 import { google } from '@ai-sdk/google';
 import { z } from 'zod';
-import {
-  analyzeTopicDifficulty,
-  calculateSpacedRepetition,
-  checkTimeConflicts,
-  optimizeSessionDistribution,
-  generateBreakSchedule,
-} from './tools';
 
 const sessionSchema = z.object({
   id: z.string(),
@@ -70,14 +63,6 @@ Example session format:
 }
 
 Always prioritize educational effectiveness while creating realistic, achievable schedules that students can actually follow.`,
-
-  tools: {
-    analyzeTopicDifficulty,
-    calculateSpacedRepetition,
-    checkTimeConflicts,
-    optimizeSessionDistribution,
-    generateBreakSchedule,
-  },
 
   experimental_output: Output.object({
     schema: timetableOutputSchema,

@@ -2,6 +2,7 @@
 
 import { useUIStore } from '@/store/ui-store';
 import { useRevisionStore } from '@/store/revision-store';
+import { useAgentMemoryStore } from '@/store/agent-memory-store';
 import { MessageDock } from '@/components/ui/shadcn-io/message-dock';
 import { TimetableDisplay } from '@/components/timetable/timetable-display';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
