@@ -199,14 +199,25 @@ export default function DashboardPage() {
         {/* Timetable Display */}
         <TimetableDisplay />
 
-        {/* AI Message Dock */}
+        {/* AI Message Dock / Loading State */}
         <div className="fixed bottom-6 right-6 z-50">
-          <MessageDock
-            characters={aiCharacters}
-            onMessageSend={handleAdjustTimetable}
-            position="bottom"
-            showSparkleButton={true}
-          />
+          {isAdjusting ? (
+            <div className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-6 py-4 rounded-2xl shadow-lg border border-white/20">
+              <div className="flex items-center gap-3">
+                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                <span className="font-medium">
+                  🧙‍♂️ Adjusting your timetable...
+                </span>
+              </div>
+            </div>
+          ) : (
+            <MessageDock
+              characters={aiCharacters}
+              onMessageSend={handleAdjustTimetable}
+              position="bottom"
+              showSparkleButton={true}
+            />
+          )}
         </div>
       </div>
     </div>
