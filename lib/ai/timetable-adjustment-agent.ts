@@ -66,5 +66,5 @@ Always explain what changes were made and why, ensuring the user understands the
     schema: adjustmentOutputSchema,
   }),
 
-  stopWhen: stepCountIs(10),
+  stopWhen: stepCountIs(2),
 });
