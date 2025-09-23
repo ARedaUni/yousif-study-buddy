@@ -37,12 +37,40 @@ export async function POST(request: NextRequest) {
       notes: session.notes,
     }));
 
+    // Default availability if not provided
+    const defaultAvailability = {
+      monday: [{ start: '16:00', end: '20:00' }],
+      tuesday: [{ start: '16:00', end: '20:00' }],
+      wednesday: [{ start: '16:00', end: '20:00' }],
+      thursday: [{ start: '16:00', end: '20:00' }],
+      friday: [{ start: '16:00', end: '20:00' }],
+      saturday: [{ start: '10:00', end: '18:00' }],
+      sunday: [{ start: '10:00', end: '18:00' }],
+      schoolHours: { start: '09:00', end: '15:30' },
+    };
+
+    // Default preferences if not provided
+    const defaultPreferences = {
+      sessionLength: 45,
+      breakLength: 15,
+      maxSessionsPerDay: 4,
+      studyStyle: 'balanced',
+      preferredTimes: ['afternoon', 'evening'],
+      includeWeekends: true,
+    };
+
     const adjustmentPrompt = `Adjust the following timetable based on the user's request:
 
 USER REQUEST: "${prompt.trim()}"
 
 CURRENT TIMETABLE:
 ${JSON.stringify(currentSchedule, null, 2)}
+
+Available study times:
+${JSON.stringify(defaultAvailability, null, 2)}
+
+Study preferences:
+${JSON.stringify(defaultPreferences, null, 2)}
 
 Please analyze the user's request and make the appropriate adjustments to the timetable. Consider:
 1. The specific changes requested by the user
