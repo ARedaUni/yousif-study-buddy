@@ -6,6 +6,7 @@ interface RevisionState {
   topics: Topic[];
   sessions: Session[];
   isGenerating: boolean;
+  isAdjusting: boolean;
   error: string | null;
 
   addTopic: (topic: Topic) => void;
@@ -16,7 +17,9 @@ interface RevisionState {
   clearSessions: () => void;
 
   generateTimetable: () => Promise<void>;
+  adjustTimetable: (prompt: string) => Promise<void>;
   setGenerating: (generating: boolean) => void;
+  setAdjusting: (adjusting: boolean) => void;
   setError: (error: string | null) => void;
 }
 
@@ -44,6 +47,7 @@ export const useRevisionStore = create<RevisionState>()(
       topics: [],
       sessions: [],
       isGenerating: false,
+      isAdjusting: false,
       error: null,
 
       addTopic: (topic: Topic) => {
@@ -122,8 +126,77 @@ export const useRevisionStore = create<RevisionState>()(
         }
       },
 
+      adjustTimetable: async (prompt: string) => {
+        const { sessions } = get();
+
+        if (sessions.length === 0) {
+          set({
+            error: 'No timetable to adjust. Please generate a timetable first.',
+          });
+          return;
+        }
+
+        if (!prompt.trim()) {
+          set({ error: 'Please provide an adjustment request.' });
+          return;
+        }
+
+        set({ isAdjusting: true, error: null });
+
+        try {
+          const response = await fetch('/api/ai/adjust-timetable', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              sessions: sessions,
+              prompt: prompt.trim(),
+            }),
+          });
+
+          if (!response.ok) {
+            throw new Error(
+              `Failed to adjust timetable: ${response.statusText}`
+            );
+          }
+
+          const data = await response.json();
+
+          // Convert the response to our Session format
+          const adjustedSessions: Session[] = data.sessions.map(
+            (session: any) => ({
+              ...session,
+              startTime: new Date(session.startTime),
+              endTime: new Date(session.endTime),
+              color:
+                SUBJECT_COLORS[
+                  session.subject as keyof typeof SUBJECT_COLORS
+                ] || '#6B7280',
+            })
+          );
+
+          set({
+            sessions: adjustedSessions,
+            isAdjusting: false,
+          });
+        } catch (error) {
+          set({
+            error:
+              error instanceof Error
+                ? error.message
+                : 'An unknown error occurred while adjusting timetable',
+            isAdjusting: false,
+          });
+        }
+      },
+
       setGenerating: (generating: boolean) => {
         set({ isGenerating: generating });
+      },
+
+      setAdjusting: (adjusting: boolean) => {
+        set({ isAdjusting: adjusting });
       },
 
       setError: (error: string | null) => {

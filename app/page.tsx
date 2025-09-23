@@ -16,7 +16,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import { Plus, Trash2, Sparkles } from 'lucide-react';
+import { Plus, Trash2, Sparkles, Wand2 } from 'lucide-react';
 import { useState } from 'react';
 
 const COMMON_SUBJECTS = [
@@ -44,10 +44,14 @@ export default function DashboardPage() {
     addTopic,
     removeTopic,
     generateTimetable,
+    adjustTimetable,
     isGenerating,
+    isAdjusting,
+    error,
   } = useRevisionStore();
   const [selectedSubject, setSelectedSubject] = useState('');
   const [topicName, setTopicName] = useState('');
+  const [adjustmentPrompt, setAdjustmentPrompt] = useState('');
 
   const aiCharacters = [
     { emoji: '🧙‍♂️', name: 'AI Tutor', online: true },
@@ -69,15 +73,10 @@ export default function DashboardPage() {
     setSelectedSubject('');
   };
 
-  const handleAIMessage = (message: string, character: any) => {
-    console.log('AI Message:', message, character);
-    if (
-      message.toLowerCase().includes('generate') ||
-      message.toLowerCase().includes('schedule') ||
-      message.toLowerCase().includes('timetable')
-    ) {
-      generateTimetable();
-    }
+  const handleAdjustTimetable = async (message: string) => {
+    if (!message.trim()) return;
+
+    await adjustTimetable(message);
   };
 
   return (
@@ -188,6 +187,15 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
 
+        {/* Error Display */}
+        {error && (
+          <Card className="border-red-200 bg-red-50">
+            <CardContent className="pt-6">
+              <p className="text-red-800">{error}</p>
+            </CardContent>
+          </Card>
+        )}
+
         {/* Timetable Display */}
         <TimetableDisplay />
 
@@ -195,7 +203,7 @@ export default function DashboardPage() {
         <div className="fixed bottom-6 right-6 z-50">
           <MessageDock
             characters={aiCharacters}
-            onMessageSend={handleAIMessage}
+            onMessageSend={handleAdjustTimetable}
             position="bottom"
             showSparkleButton={true}
           />
